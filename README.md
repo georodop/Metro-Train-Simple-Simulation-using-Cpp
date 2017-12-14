@@ -29,9 +29,11 @@ Member data might be:
     if !hasTicket when ticketInspector enters the Waggon then busted=true
 - __disembarkStation__ (When the train gets to this station, get of the train)
     if busted then disembarkStation = nextStation
+
 __Destroyed when?__ After disembarkation:
 - Immediately?
 - First stored at the station and then destroyed with the station?
+
 __Created when?__
 - At the begining of the program, with the stations?
 - Right before embarkation?
