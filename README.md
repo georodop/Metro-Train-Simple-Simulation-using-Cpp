@@ -11,6 +11,8 @@ Exercise 1, part of the 1st groups of exercises (Aeroplana kai Vagonia!)
 Member data might be:
 - __trainWaggons__: Maybe an array of objects of type Waggon.
 - __totalRevenue__: Money made from passengers paying tickets and fines.
+- __currentStation__: Maybe an int to hold the current station every time the train stops.
+- __nextStation__: Maybe an int = currentStation + 1 except if currentStation == stationsCount
 
 Member functions might be:
 - __operate(int stationsCount)__: Operate the train and its waggons for stationsCount = N.
