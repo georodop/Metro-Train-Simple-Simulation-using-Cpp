@@ -32,6 +32,7 @@ Member functions might be:
     - disembarkation(): Disembark the Passengers whose disembarkStation = currentStation.
     - embarkation(): Embark newPassengers random newPassengersCount < emptySeats = (maxCapacity - currentPassengersCount).
     Problem: should I create here the newPassengers or create them at the stations and just move them.
+    
 
 
 ### Passenger
@@ -50,3 +51,14 @@ __Destroyed when?__ After disembarkation:
 __Created when?__
 - At the beginning of the program, with the stations?
 - Right before embarkation?
+
+
+## Open Questions
+-----------------
+- Where to create and destroy the Passengers.
+    - Let the embarkation/disembarkation processes of the Wagon objects handle this?
+    - Create them at the stations and just move them on/off the train wagons?
+- Which class should be responsible for tickets inspection.
+    - MetroTrain if I want the train to control how many wagons can be checked at the same time.
+    - Waggon if I don't care for the above and just want to implement this as a possibility per wagon.
+    - A separate class TicketsInspector if I want more flexibility to create as many TicketsInspector objects as I want and 
