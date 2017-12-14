@@ -1,7 +1,8 @@
-# Aeroplana kai Vagonia
-(Object Oriented Programming Assignment. 1st group, exercise 1)
+# Metro Train Simple Simulation using C++
+Object Oriented Programming Course Assignment.
 
-Purpose: Crate a simple metro train simulation
+Exercise 1, part of the 1st groups of exersices (Aeroplana kai Vagonia!)
+
 
 ## Basic Object Classes
 -----------------------
@@ -17,5 +18,20 @@ Member data might be:
 - __currentPassengers__:
     Maybe an array of objects of type Passenger.
 - __currentPassengersCount__:
-    (Smaller than maxCapacity)
+    (Has to be smaller than maxCapacity)
+Destroyed when the train is destroyed.
 
+### Passenger
+Member data might be:
+- __hasTicket__ (boolean, randomly selected during object initialization)
+- __rightForReducedTicket__ (same as above)
+- __busted__ 
+    if !hasTicket when ticketInspector enters the Waggon then busted=true
+- __disembarkStation__ (When the train gets to this station, get of the train)
+    if busted then disembarkStation = nextStation
+__Destroyed when?__ After disembarkation:
+- Immediately?
+- First stored at the station and then destroyed with the station?
+__Created when?__
+- At the begining of the program, with the stations?
+- Right before embarkation?
