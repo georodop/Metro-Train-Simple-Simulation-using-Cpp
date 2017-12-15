@@ -1,13 +1,12 @@
 #include <iostream>
 
 using std::cout;
-static const int maxCapacity(50);
-//ToDo: Dynamic allocation of every Wagon object in order to
-//      accept maxCapacity as an argument of the constructor
-//      http://lists.di.uoa.gr/showthread.php?t=4104
-//      http://www.cplusplus.com/forum/general/52820/
 
 /*******************************************************************************
+ [ ] ToDo1: Implement metroTrain operate for N stations
+ [ ] ToDo2: Implement Passenger constructor/destructor
+ [ ] ToDo3: Study more examples of dynamic memory allocation, pointers to 
+            pointers etc
 
 *******************************************************************************/
 class Passenger
@@ -24,6 +23,7 @@ private:
     //if !hasTicket when ticketInspector enters the Waggon then busted=true
     bool busted;
 };
+
 class Wagon
 {
 private:
@@ -35,14 +35,13 @@ private:
 
 public:
     //This constructor should create a wagon with empty Passenger seats 
-    //Empty seats count should be 
-    Wagon(): 
-        m_maxCapacity(maxCapacity),     //ToDo:
+    Wagon(int maxCapacity): 
+        m_maxCapacity(maxCapacity),
         m_passengersCount(0)
     {
         m_passengers = new Passenger[maxCapacity];
         //ToDo: set to nullptr every seat
-        cout << "A waggon with capacity for " << maxCapacity  
+        cout << "A wagon with capacity for " << maxCapacity  
             << " passengers, was created \n";
     }
     
@@ -50,7 +49,7 @@ public:
     {
         delete[] m_passengers;
         
-        cout << "A waggon was destroyed \n";
+        cout << "A wagon was destroyed \n";
     }
     
     //Disembark the Passengers whose disembarkStation = currentStation.
@@ -69,10 +68,12 @@ public:
 
     //inStation(currentStation) Probably I'll implement this in MetroTrain class
 };
+
 class MetroTrain
 {
 private:
-    Wagon *m_wagons;        //Pointer to a dynamically allocated wagons array
+    //Pointer to a dynamically allocated array of pointers to wagons
+    Wagon** m_wagons;       
     int m_wagonsCount;      //Length of the array. Represents the wagons count
     
     //Holds the current station id every time the train stops. Initialized to 0
@@ -83,15 +84,24 @@ private:
     int m_totalRevenue;
     
 public:
-    MetroTrain(int wagonsCount): 
+    MetroTrain(int wagonsCount, int wagonMaxCapacity): 
         m_wagonsCount(wagonsCount), m_currentStation(0), m_totalRevenue(0)
     {
-        m_wagons = new Wagon[wagonsCount];  //ToDo
+        m_wagons = new Wagon*[wagonsCount];
+        for(int i=0; i<wagonsCount; i++)
+        {
+            m_wagons[i] = new Wagon(wagonMaxCapacity);
+        }
+        
         cout << "A metro train with " << wagonsCount << " wagons, was created \n";
     }
     
     ~MetroTrain()
     {
+        for(int i=0; i<m_wagonsCount; i++)
+        {
+            delete m_wagons[i];
+        }
         delete[] m_wagons;
         //we don't need to set m_wagons to null or m_wagonsCount to 0 here, 
         //since the object will be destroyed immediately after this function anyway
@@ -114,9 +124,10 @@ public:
 
 int main()
 {
+    const int wagonsCount(10), wagonMaxCapacity(50);
     
-//Create a metroTrain that will operate for N stations
-    MetroTrain testTrain(10);
+    //Create a metroTrain that will operate for N stations
+    MetroTrain testTrain(wagonsCount, wagonMaxCapacity);
     
     return 0;
 }
