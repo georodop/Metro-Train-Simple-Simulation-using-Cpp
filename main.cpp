@@ -2,17 +2,19 @@
  [*] ToDo1:     Implement MetroTrain operate for N stations
  [*] 1.5:       Implement MetroTrain inStation
  [ ] 1.6:       Put first the public part in every class
- [*] ToDo2:     Passenger Constructor first implementation
- [ ] 2.5:       Passenger Destructor: do I need one?
- [ ] 2.6:       Modify Passenger constructor calls since now it accepts arguments
- [ ] 2.7:       Implement MetroTrain betweenStations
+ [*] ToDo2:     PassengerSeat Constructor first implementation
+ [*] 2.3:       Change Passenger to PassengerSeat and hold if the seat is empty
+ [ ] 2.5:       PassengerSeat Destructor: do I need one?
+ [*] 2.6:       Modify PassengerSeat constructor calls since now it accepts arguments
+ [ ] 2.7:       PassengerSeat mutator to change seats from empty to taken
+ [ ] 2.8:       Implement MetroTrain betweenStations
  [ ] ToDo3:     Study more examples of dynamic memory allocation, pointers to 
                 pointers etc
  [ ] ToDo4:     Get the stationsCount from command line
  [ ] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
  [ ] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
                 in operate 
- [ ] ToDo7:     Create an accessor for Passenger's busted variabl
+ [ ] ToDo7:     Create an accessor for PassengerSeat's busted variabl
 
 *******************************************************************************/
 #include <iostream>
@@ -43,9 +45,10 @@ int getRandomNumber(int min, int max)
     return min + static_cast<int>((max - min + 1) * (rand() * fraction));
 }
 
-class Passenger
+class PassengerSeat
 {
 private:
+    bool m_isEmpty;
     bool m_hasTicket;
     bool m_rightForReducedTicket;
     //When the train gets to disembarkStation station, get off the train
@@ -56,31 +59,35 @@ private:
     
 public:
     //Temporary default constructor till constructor calls modification
-    Passenger() { } 
-    Passenger
+    PassengerSeat() { } 
+    PassengerSeat
     (
         const int disembarkStation,
         const double probHasTicket = 0.5,
         const double probReducedTicket = 0.5
     ):
-       m_disembarkStation(disembarkStation),
-       m_hasTicket(randomBoolWithProb(probHasTicket)),
-       m_rightForReducedTicket(randomBoolWithProb(probReducedTicket)),
-       m_busted(false)
+        m_isEmpty(true),
+        m_disembarkStation(disembarkStation),
+        m_hasTicket(randomBoolWithProb(probHasTicket)),
+        m_rightForReducedTicket(randomBoolWithProb(probReducedTicket)),
+        m_busted(false)
+    {
+        cout << "New PassengerSeat with destination: " << m_disembarkStation << "\n";
+        
+    }
+    
+    ~PassengerSeat()
     {
         
     }
     
-    ~Passenger()
-    {
-        
-    }
+    //ToDo
 };
 
 class Wagon
 {
 private:
-    Passenger *m_passengers;    //Pointer to a passengers array
+    PassengerSeat** m_passengers;    //Pointer to a passengers array
     
     //Zero initialized at the constructor. Has to stay smaller than maxCapacity
     int m_passengersCount; 
@@ -92,7 +99,12 @@ public:
         m_maxCapacity(maxCapacity),
         m_passengersCount(0)
     {
-        m_passengers = new Passenger[maxCapacity];
+        m_passengers = new PassengerSeat*[maxCapacity];
+        for(int i(0); i<maxCapacity; i++)
+        {
+            m_passengers[i] = new PassengerSeat(7); //ToDo: New argument
+        }
+        //m_passengers = new Passenger[maxCapacity];
         //ToDo: set to nullptr every seat
         cout << "A wagon with capacity for " << maxCapacity  
             << " passengers, was created \n";
@@ -100,6 +112,10 @@ public:
     
     ~Wagon()
     {
+        for(int i(0); i<m_maxCapacity; i++)
+        {
+            delete m_passengers[i];
+        }
         delete[] m_passengers;
         
         cout << "A wagon was destroyed \n";
@@ -222,7 +238,7 @@ public:
 
 int main()
 {
-    const int wagonsCount(10), wagonMaxCapacity(50), stationsCount(7);
+    const int wagonsCount(10), wagonMaxCapacity(30), stationsCount(7);
     
     //Create a metroTrain that will operate for N stations
     MetroTrain metroTrain1(wagonsCount, wagonMaxCapacity);
