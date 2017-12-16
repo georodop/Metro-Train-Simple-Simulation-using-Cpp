@@ -1,33 +1,80 @@
+/*******************************************************************************
+ [*] ToDo1:     Implement MetroTrain operate for N stations
+ [*] 1.5:       Implement MetroTrain inStation
+ [ ] 1.6:       Put first the public part in every class
+ [*] ToDo2:     Passenger Constructor first implementation
+ [ ] 2.5:       Passenger Destructor: do I need one?
+ [ ] 2.6:       Modify Passenger constructor calls since now it accepts arguments
+ [ ] 2.7:       Implement MetroTrain betweenStations
+ [ ] ToDo3:     Study more examples of dynamic memory allocation, pointers to 
+                pointers etc
+ [ ] ToDo4:     Get the stationsCount from command line
+ [ ] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
+ [ ] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
+                in operate 
+ [ ] ToDo7:     Create an accessor for Passenger's busted variabl
+
+*******************************************************************************/
 #include <iostream>
 
 using std::cout;
 
-/*******************************************************************************
- [*] ToDo1: Implement MetroTrain operate for N stations
- [*] 1a:    Implement MetroTrain inStation
- [ ] 2a:    Implement MetroTrain betweenStations
- [ ] ToDo2: Implement Passenger constructor/destructor
- [ ] ToDo3: Study more examples of dynamic memory allocation, pointers to 
-            pointers etc
- [ ] ToDo4: Get the stationsCount from command line
- [ ] ToDo5: Delete m_currentStation from MetroTrain class if not needed
- [ ] ToDo6: Decide if stationsCount will be given in MetroTrain constructor or
-            in operate 
 
-*******************************************************************************/
+#include <cassert>
+
+// Returns randomly true with a given probability between 0 and 1
+// Assumes srand() has already been called
+bool randomBoolWithProb(double probability)
+{
+    assert(probability>=0 && probability<=1);
+    
+    return rand()/(RAND_MAX+1.0) < probability;
+}
+
+
+// Generate a random number between min and max (inclusive)
+// Assumes srand() has already been called
+// Assumes max - min <= RAND_MAX
+int getRandomNumber(int min, int max)
+{
+    // static used for efficiency, so we only calculate this value once
+    static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);  
+    // evenly distribute the random number across our range
+    return min + static_cast<int>((max - min + 1) * (rand() * fraction));
+}
+
 class Passenger
 {
 private:
-    //The following 3 variables get a suitable random value 
-    //during initialiazation at the constructor
-    bool hasTicket;
-    bool rightForReducedTicket;
-    int disembarkStation; 
+    bool m_hasTicket;
+    bool m_rightForReducedTicket;
     //When the train gets to disembarkStation station, get off the train
     //if busted betweenStations then disembarkStation = nextStation
-    
+    int m_disembarkStation; 
     //if !hasTicket when ticketInspector enters the Waggon then busted=true
-    bool busted;
+    bool m_busted;        //ToDo7: I will need an accessor for this one
+    
+public:
+    //Temporary default constructor till constructor calls modification
+    Passenger() { } 
+    Passenger
+    (
+        const int disembarkStation,
+        const double probHasTicket = 0.5,
+        const double probReducedTicket = 0.5
+    ):
+       m_disembarkStation(disembarkStation),
+       m_hasTicket(randomBoolWithProb(probHasTicket)),
+       m_rightForReducedTicket(randomBoolWithProb(probReducedTicket)),
+       m_busted(false)
+    {
+        
+    }
+    
+    ~Passenger()
+    {
+        
+    }
 };
 
 class Wagon
@@ -120,7 +167,7 @@ private:
     
     void betweenStations()
     {
-        
+        //Tickets inspection process gets triggered here
     }
     
     
