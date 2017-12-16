@@ -7,6 +7,10 @@ using std::cout;
  [ ] ToDo2: Implement Passenger constructor/destructor
  [ ] ToDo3: Study more examples of dynamic memory allocation, pointers to 
             pointers etc
+ [ ] ToDo4: Get the stationsCount from command line
+ [ ] ToDo5: Delete m_currentStation from MetroTrain class if not needed
+ [ ] ToDo6: Decide if stationsCount will be given in MetroTrain constructor or
+            in operate 
 
 *******************************************************************************/
 class Passenger
@@ -76,6 +80,7 @@ private:
     Wagon** m_wagons;       
     int m_wagonsCount;      //Length of the array. Represents the wagons count
     
+    //ToDo5: Delete if redundant
     //Holds the current station id every time the train stops. Initialized to 0
     int m_currentStation;
     //int nextStation;
@@ -111,8 +116,29 @@ public:
     
     void operate(int stationsCount)
     {
-        //inStation(currentStation);
-        //betweenStations(previousStation, nextStation);
+        cout << "Train operates now \n";
+        for(int i(1); i<=stationsCount; i++)
+        {
+            int &currentStation = i;    //Just an alias
+            
+            bool isLastStation = (currentStation == stationsCount) ;
+            inStation(currentStation, isLastStation);
+            if(!isLastStation)
+            {
+                betweenStations();
+            }
+        }
+    }
+    
+    //Here I need to know if this is the last station in order to disembark all
+    void inStation(const int &currentStation, const bool &isLastStation)
+    {
+        cout << "inStation: " << currentStation << "\n";
+    }
+    
+    void betweenStations()
+    {
+        
     }
     
     void printStatistics()
@@ -124,10 +150,12 @@ public:
 
 int main()
 {
-    const int wagonsCount(10), wagonMaxCapacity(50);
+    const int wagonsCount(10), wagonMaxCapacity(50), stationsCount(7);
     
     //Create a metroTrain that will operate for N stations
-    MetroTrain testTrain(wagonsCount, wagonMaxCapacity);
+    MetroTrain metroTrain1(wagonsCount, wagonMaxCapacity);
+    
+    metroTrain1.operate(stationsCount);
     
     return 0;
 }
