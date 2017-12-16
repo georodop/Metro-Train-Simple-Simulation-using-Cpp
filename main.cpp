@@ -3,7 +3,9 @@
 using std::cout;
 
 /*******************************************************************************
- [ ] ToDo1: Implement metroTrain operate for N stations
+ [*] ToDo1: Implement MetroTrain operate for N stations
+ [*] 1a:    Implement MetroTrain inStation
+ [ ] 2a:    Implement MetroTrain betweenStations
  [ ] ToDo2: Implement Passenger constructor/destructor
  [ ] ToDo3: Study more examples of dynamic memory allocation, pointers to 
             pointers etc
@@ -67,7 +69,9 @@ public:
     //newPassengersCount < emptySeats = (maxCapacity - currentPassengersCount)
     void embarkation()
     {
-        
+        // static int count;
+        // count++;
+        // cout << "Embarkation count " << count << "\n";
     }
 
     //inStation(currentStation) Probably I'll implement this in MetroTrain class
@@ -87,6 +91,38 @@ private:
     
     //Money from passengers paying a fine after being found without a ticket.
     int m_totalRevenue;
+    
+    
+    //Here I need to know if this is the last station in order to disembark all
+    void inStation(const int &currentStation, const bool &isLastStation)
+    {
+        cout << "inStation: " << currentStation << "\n";
+        
+        const bool isFirstStation = (currentStation == 1);
+        if(!isFirstStation)     //First disembark
+        {
+            //Here loop through the wagons and call Wagon's disembarkation()
+            for(int i(0); i<m_wagonsCount; i++)
+            {
+                m_wagons[i]->disembarkation();
+            }
+        }
+        if(!isLastStation)      //Then embark
+        {
+            //Here loop through the wagons and call Wagon's embarkation()
+            for(int i(0); i<m_wagonsCount; i++)
+            {
+                m_wagons[i]->embarkation();
+            }
+        }
+        
+    }
+    
+    void betweenStations()
+    {
+        
+    }
+    
     
 public:
     MetroTrain(int wagonsCount, int wagonMaxCapacity): 
@@ -128,17 +164,6 @@ public:
                 betweenStations();
             }
         }
-    }
-    
-    //Here I need to know if this is the last station in order to disembark all
-    void inStation(const int &currentStation, const bool &isLastStation)
-    {
-        cout << "inStation: " << currentStation << "\n";
-    }
-    
-    void betweenStations()
-    {
-        
     }
     
     void printStatistics()
