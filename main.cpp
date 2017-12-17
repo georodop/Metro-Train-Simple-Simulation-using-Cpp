@@ -9,16 +9,14 @@
  [*] 2.45:      Wagon's embarkation() first implementation
  [*] 2.47:      Wagon's disembarkation() first implementation
  [*] 2.48:      Modify embarkation() to check in a loop every seat if it is empty
- [ ] 2.5:       Passenger Destructor: do I need one?
  [*] 2.6:       Modify Passenger constructor calls since now it accepts arguments
- [ ] 2.8:       Implement MetroTrain betweenStations
- [ ] ToDo3:     Study more examples of dynamic memory allocation, pointers to 
-                pointers etc
+ [*] 2.8:       Implement MetroTrain betweenStations
  [ ] ToDo4:     Get the stationsCount from command line
- [ ] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
- [ ] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
-                in operate 
- [ ] ToDo7:     Create an accessor and a mutator for Passenger's busted variable
+ [*] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
+ [*] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
+                in operate. Answer: in operate.
+ [ ] ToDo7:     printStatistics:+ train's total revenue from ticket inspections
+ [ ] ToDo10:    Separate .cpp and .h files
 
 *******************************************************************************/
 #include <iostream>
@@ -52,7 +50,6 @@ int getRandomNumber(int min, int max)
 class Passenger
 {
 private:
-    bool m_isEmpty;         //ToDo2.4
     bool m_hasTicket;
     bool m_rightForReducedTicket;
     //When the train gets to disembarkStation station, get off the train
@@ -67,7 +64,7 @@ public:
     Passenger
     (
         const int disembarkStation,
-        const double probHasTicket = 0.5,
+        const double probHasTicket = 0.7,
         const double probReducedTicket = 0.5
     ):
         m_disembarkStation(disembarkStation),
@@ -101,6 +98,7 @@ private:
     //Zero initialized at the constructor. Has to stay smaller than maxCapacity
     int m_passengersCount; 
     int m_maxCapacity;
+    int m_totalWithoutTicket;
     int m_totalBusted;
 
 public:
@@ -109,6 +107,7 @@ public:
     Wagon(int maxCapacity): 
         m_maxCapacity(maxCapacity),
         m_passengersCount(0),
+        m_totalWithoutTicket(0),
         m_totalBusted(0)
     {
         m_passengers = new Passenger*[maxCapacity];
@@ -181,6 +180,11 @@ public:
                 m_passengers[seat] = new Passenger(destination);
                 m_passengersCount++;
                 passenger++;
+                
+                if(!m_passengers[seat]->getHasTicket())     //No ticket !
+                {
+                    m_totalWithoutTicket++;
+                }
             }
         }
         // cout << emptySeatsCount << " empty seats. \t" << newPassengers <<" / "<< newPassengersMax
@@ -221,6 +225,10 @@ public:
          * - What is the total count of passengers that entered the wagon
          * - How many had a reduced ticket
          * ********************************************************************/
+         cout << "Embarked without a ticket: " << m_totalWithoutTicket << "\n";
+         cout << "Busted: " << m_totalBusted ;
+         cout << " Got away: " << m_totalWithoutTicket - m_totalBusted << "\n";
+                    
     }
     
 };
@@ -231,11 +239,6 @@ private:
     //Pointer to a dynamically allocated array of pointers to wagons
     Wagon** m_wagons;       
     int m_wagonsCount;      //Length of the array. Represents the wagons count
-    
-    //ToDo5: Delete if redundant
-    //Holds the current station id every time the train stops. Initialized to 0
-    int m_currentStation;
-    //int nextStation;
     
     //Money from passengers paying a fine after being found without a ticket.
     int m_totalRevenue;
@@ -254,10 +257,10 @@ private:
         //Here loop through the wagons and disembark first/embark then
         for(int i(0); i<m_wagonsCount; i++)
         {
-            cout << "Wagon " << i+1 << " / " << m_wagonsCount << "\n";
             int disembarked = m_wagons[i]->disembarkation(currentStation);
             int embarked = m_wagons[i]->embarkation(currentStation, stationsCount);
-            cout << disembarked << " disembarked. \t" << embarked << " embarked.\n";
+            // cout << "Wagon " << i+1 << " / " << m_wagonsCount << "\n";
+            // cout << disembarked << " disembarked. \t" << embarked << " embarked.\n";
         }
         //Choose a wagon for the next ticket inspection
         m_wagonForNextInspection = getRandomNumber(0, m_wagonsCount-1);
@@ -272,16 +275,17 @@ private:
         //- Call a Wagon's function, e.g. ticketsInspection, in order to change
         //the destination of the busted passengers. This function should
         //return the count of the passengers found without ticket
-        assert(m_wagonForNextInspection<m_wagonsCount && !m_wagonForNextInspection < 0);
+        assert(m_wagonForNextInspection<m_wagonsCount);
+        assert(!(m_wagonForNextInspection < 0));
         int countBusted = m_wagons[m_wagonForNextInspection]->ticketsInspection(nextStation);
-        cout << "Tickets Inspection in wagon " << m_wagonForNextInspection 
-                << ". " << countBusted << " Busted !\n";
+        // cout << "Tickets Inspection in wagon " << m_wagonForNextInspection+1
+        //         << ". " << countBusted << " Busted !\n";
     }
     
     
 public:
     MetroTrain(int wagonsCount, int wagonMaxCapacity): 
-        m_wagonsCount(wagonsCount), m_currentStation(0),
+        m_wagonsCount(wagonsCount), 
         m_totalRevenue(0), m_wagonForNextInspection(-1)
     {
         m_wagons = new Wagon*[wagonsCount];
@@ -330,6 +334,11 @@ public:
          * Should call Wagon's printStatistics for every wagon.
          * ********************************************************************/
         
+        for(int i(0); i<m_wagonsCount; i++)
+        {
+            cout << "\nWagon num. " << i+1 << " of " << m_wagonsCount << "\n";
+            m_wagons[i]->printStatistics();
+        }
     }
         
 };
@@ -343,6 +352,7 @@ int main()
     MetroTrain metroTrain1(wagonsCount, wagonMaxCapacity);
     
     metroTrain1.operate(stationsCount);
+    metroTrain1.printStatistics();
     
     return 0;
 }
