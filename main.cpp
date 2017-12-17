@@ -87,10 +87,9 @@ public:
         
     }
     
-    int getDisembarkStation()
-    {
-        return m_disembarkStation;
-    }
+    int getDisembarkStation() { return m_disembarkStation; }
+    int getHasTicket() { return m_hasTicket; }
+    void setDestination(int station) {  m_disembarkStation = station; }
     
 };
 
@@ -102,13 +101,15 @@ private:
     //Zero initialized at the constructor. Has to stay smaller than maxCapacity
     int m_passengersCount; 
     int m_maxCapacity;
+    int m_totalBusted;
 
 public:
     //This constructor should create a wagon with empty Passenger seats 
     //An empty seat is marked with a nullptr.
     Wagon(int maxCapacity): 
         m_maxCapacity(maxCapacity),
-        m_passengersCount(0)
+        m_passengersCount(0),
+        m_totalBusted(0)
     {
         m_passengers = new Passenger*[maxCapacity];
         for(int i(0); i<maxCapacity; i++)
@@ -187,6 +188,27 @@ public:
         return newPassengersCount;
     }
     
+    //Loops through all the wagon's passengers to check if they have ticket
+    //For passengers found without ticket disembarkStation=nextStation
+    int ticketsInspection(const int &nextStation)
+    {
+        int bustedCount(0);
+        for(int seat(0); seat<m_maxCapacity; seat++)
+        {
+            if(m_passengers[seat] != nullptr)           //The seat is not emtpy
+            {
+                if(!m_passengers[seat]->getHasTicket())     //No ticket !
+                {
+                    //cout << "Busted !!!\n";
+                    m_passengers[seat]->setDestination(nextStation);
+                    bustedCount++;
+                    m_totalBusted++;
+                }
+            }
+        }
+        return bustedCount;
+    }
+    
     void printStatistics()
     {
         /***********************************************************************
@@ -218,13 +240,16 @@ private:
     //Money from passengers paying a fine after being found without a ticket.
     int m_totalRevenue;
     
+    //This will be set every time during inStation and accessed betweenStations
+    int m_wagonForNextInspection;               //min=0, max = m_wagonsCount -1
+    
     
     //Here I need to know if this is the last station in order to disembark all
     void inStation (const int &currentStation, const int &stationsCount)
     {
         cout << "inStation: " << currentStation << "\n";
         
-        //ToDo: Find a way to mark a wagon as forTicketInspection. This can be
+        //ToDo: Find a way to mark a wagon as m_wagonForNextInspection. This can be
         //      an int var of MetroTrain class or a boolean of the Wagon class
         //Here loop through the wagons and disembark first/embark then
         for(int i(0); i<m_wagonsCount; i++)
@@ -234,23 +259,30 @@ private:
             int embarked = m_wagons[i]->embarkation(currentStation, stationsCount);
             cout << disembarked << " disembarked. \t" << embarked << " embarked.\n";
         }
+        //Choose a wagon for the next ticket inspection
+        m_wagonForNextInspection = getRandomNumber(0, m_wagonsCount-1);
         
     }
     
-    void betweenStations()
+    void betweenStations(const int nextStation)
     {
-        //Tickets inspection process gets triggered here
+        //Tickets inspection process gets triggered here:
         //- Get from a MetroTrain int var, e.g. m_wagonForNextInspection, which 
         //wagon should be checked.
         //- Call a Wagon's function, e.g. ticketsInspection, in order to change
         //the destination of the busted passengers. This function should
         //return the count of the passengers found without ticket
+        assert(m_wagonForNextInspection<m_wagonsCount && !m_wagonForNextInspection < 0);
+        int countBusted = m_wagons[m_wagonForNextInspection]->ticketsInspection(nextStation);
+        cout << "Tickets Inspection in wagon " << m_wagonForNextInspection 
+                << ". " << countBusted << " Busted !\n";
     }
     
     
 public:
     MetroTrain(int wagonsCount, int wagonMaxCapacity): 
-        m_wagonsCount(wagonsCount), m_currentStation(0), m_totalRevenue(0)
+        m_wagonsCount(wagonsCount), m_currentStation(0),
+        m_totalRevenue(0), m_wagonForNextInspection(-1)
     {
         m_wagons = new Wagon*[wagonsCount];
         for(int i=0; i<wagonsCount; i++)
@@ -285,7 +317,7 @@ public:
             inStation(currentStation, stationsCount);
             if(!isLastStation)
             {
-                betweenStations();
+                betweenStations(currentStation+1);
             }
         }
     }
