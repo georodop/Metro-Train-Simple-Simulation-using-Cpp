@@ -135,16 +135,10 @@ public:
     //Disembark the Passengers whose disembarkStation == currentStation.
     //Passenger objects will be deleted here after disembarkation
     //Returns the count of disembarked passengers
-    int disembarkation(int currentStation)
+    int disembarkation(const int &currentStation)
     {
-        /***********************************************************************
-         * ToDo2.47:
-         * Loop through all the Passenger seats of the current Wagon's instance
-         * if the seat is not empty: m_passengers[i] != nullptr
-         * && if m_passengers[i]->getDisembarkStation() == currentStation
-         * Then delete m_passengers[i] and m_passengers[i] = nullptr
-         * 
-        /**********************************************************************/
+        if (currentStation == 1)    //No passengers yet if it's the 1st station
+            return 0;
         int initialCount = m_passengersCount;       //Before disembarkation
         for(int i(0); i<m_maxCapacity; i++)
         {
@@ -159,7 +153,7 @@ public:
             }
         }
         int disembarkedCount = initialCount - m_passengersCount;
-        cout << disembarkedCount << " passengers disembarked \n";
+        // cout << disembarkedCount << " passengers disembarked \n";
         return disembarkedCount;
     }
     
@@ -168,6 +162,8 @@ public:
     //Returns the count of passengers that just embarked
     int embarkation(const int &currentStation, const int &stationsCount)
     {
+        if(currentStation == stationsCount)
+            return 0;                       //No embarkation at the last station
         int emptySeatsCount = (m_maxCapacity - m_passengersCount);
         int newPassengersCount = getRandomNumber(0, emptySeatsCount);
         
@@ -212,28 +208,17 @@ private:
     
     
     //Here I need to know if this is the last station in order to disembark all
-    void inStation
-    (const int &currentStation, const int &stationsCount)
+    void inStation (const int &currentStation, const int &stationsCount)
     {
         cout << "inStation: " << currentStation << "\n";
         
-        const bool isFirstStation = (currentStation == 1);
-        if(!isFirstStation)                     //Disembark first 
+        //Here loop through the wagons and disembark first/embark then
+        for(int i(0); i<m_wagonsCount; i++)
         {
-            //Here loop through the wagons and call Wagon's disembarkation()
-            for(int i(0); i<m_wagonsCount; i++)
-            {
-                m_wagons[i]->disembarkation(currentStation);
-            }
-        }
-        if(currentStation!=stationsCount)       //Then embark if not last station
-        {
-            //Here loop through the wagons and call Wagon's embarkation()
-            for(int i(0); i<m_wagonsCount; i++)
-            {
-                cout << "Wagon " << i+1 << " / " << m_wagonsCount << "\n";
-                m_wagons[i]->embarkation(currentStation, stationsCount);
-            }
+            cout << "Wagon " << i+1 << " / " << m_wagonsCount << "\n";
+            int disembarked = m_wagons[i]->disembarkation(currentStation);
+            int embarked = m_wagons[i]->embarkation(currentStation, stationsCount);
+            cout << disembarked << " disembarked. \t" << embarked << " embarked.\n";
         }
         
     }
