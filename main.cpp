@@ -187,8 +187,20 @@ public:
         return newPassengersCount;
     }
     
-
-    //inStation(currentStation) Probably I'll implement this in MetroTrain class
+    void printStatistics()
+    {
+        /***********************************************************************
+         * ToDo: Store in the Wagon instances the statistics needed bellow
+         * ToDo: Print statistics about:
+         * - How many passengers entered this wagon without a ticket throughout
+         *   its whole operation
+         * - How many of the above were busted.
+         * Optionaly:
+         * - What is the total count of passengers that entered the wagon
+         * - How many had a reduced ticket
+         * ********************************************************************/
+    }
+    
 };
 
 class MetroTrain
@@ -212,6 +224,8 @@ private:
     {
         cout << "inStation: " << currentStation << "\n";
         
+        //ToDo: Find a way to mark a wagon as forTicketInspection. This can be
+        //      an int var of MetroTrain class or a boolean of the Wagon class
         //Here loop through the wagons and disembark first/embark then
         for(int i(0); i<m_wagonsCount; i++)
         {
@@ -226,6 +240,11 @@ private:
     void betweenStations()
     {
         //Tickets inspection process gets triggered here
+        //- Get from a MetroTrain int var, e.g. m_wagonForNextInspection, which 
+        //wagon should be checked.
+        //- Call a Wagon's function, e.g. ticketsInspection, in order to change
+        //the destination of the busted passengers. This function should
+        //return the count of the passengers found without ticket
     }
     
     
@@ -250,7 +269,7 @@ public:
         }
         delete[] m_wagons;
         //we don't need to set m_wagons to null or m_wagonsCount to 0 here, 
-        //since the object will be destroyed immediately after this function anyway
+        //since the object will be destroyed immediately after this function 
         
         cout << "A metro train was destroyed \n";
     }
@@ -273,6 +292,11 @@ public:
     
     void printStatistics()
     {
+        /***********************************************************************
+         * ToDo: Should print the following statistics for the metroTrain:
+         * - Money collected during ticket inspections
+         * Should call Wagon's printStatistics for every wagon.
+         * ********************************************************************/
         
     }
         
