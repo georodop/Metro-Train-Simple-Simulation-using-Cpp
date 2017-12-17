@@ -6,6 +6,8 @@
  [*] 2.3:       Change Passenger to PassengerSeat and hold if the seat is empty
  [*] 2.4:       REVERT! A seat is empty when set to nullptr. Passengers should
                 be created during Wagon's embarkation
+ [*] 2.45:      Wagon's embarkation() first implementation
+ [ ] 2.47:      Wagon's disembarkation() first implementation
  [ ] 2.5:       Passenger Destructor: do I need one?
  [*] 2.6:       Modify Passenger constructor calls since now it accepts arguments
  [ ] 2.8:       Implement MetroTrain betweenStations
@@ -67,13 +69,15 @@ public:
         const double probHasTicket = 0.5,
         const double probReducedTicket = 0.5
     ):
-        m_isEmpty(true),
         m_disembarkStation(disembarkStation),
         m_hasTicket(randomBoolWithProb(probHasTicket)),
         m_rightForReducedTicket(randomBoolWithProb(probReducedTicket)),
         m_busted(false)
     {
-        cout << "New Passenger with destination: " << m_disembarkStation << "\n";
+        static int passengerId(1);
+        passengerId++;
+        cout << "New Passenger with id: " 
+            << passengerId << " and destination: " << m_disembarkStation << "\n";
         
     }
     
@@ -131,21 +135,23 @@ public:
     
     //Here create and embark a random count of new Passengers
     //newPassengersCount < emptySeats = (maxCapacity - currentPassengersCount)
-    void embarkation()
+    void embarkation(const int &currentStation, const int &stationsCount)
     {
         // static int count;
         // count++;
         // cout << "Embarkation count " << count << "\n";
-        /*
-        int emptySeatsCount = (maxCapacity - currentPassengersCount);
-        int firstEmptySeat = m_passengersCount;     //Since seats start from 0
-        for(int i(0); i<emptySeats; i++)
+        int emptySeatsCount = (m_maxCapacity - m_passengersCount);
+        int newPassengersCount = getRandomNumber(0, emptySeatsCount);
+        
+        cout << emptySeatsCount << " empty seats. \t" << newPassengersCount
+            << " new passengers. \t" << m_passengersCount << " passengers count. \n";
+        int firstEmptySeat = m_passengersCount;         //Seats start from 0
+        for(int i(firstEmptySeat); i<(newPassengersCount+firstEmptySeat); i++)
         {
-            // m_passengers[i] = new Passenger(7); //ToDo: New argument
-            int destination = Random number between 0 and stationsCount
+            int destination = getRandomNumber(currentStation+1, stationsCount);
             m_passengers[i] = new Passenger(destination);
+            m_passengersCount++;
         }
-        */
         
     }
     
@@ -170,12 +176,13 @@ private:
     
     
     //Here I need to know if this is the last station in order to disembark all
-    void inStation(const int &currentStation, const bool &isLastStation)
+    void inStation
+    (const int &currentStation, const int &stationsCount)
     {
         cout << "inStation: " << currentStation << "\n";
         
         const bool isFirstStation = (currentStation == 1);
-        if(!isFirstStation)     //Disembark first 
+        if(!isFirstStation)                     //Disembark first 
         {
             //Here loop through the wagons and call Wagon's disembarkation()
             for(int i(0); i<m_wagonsCount; i++)
@@ -183,12 +190,13 @@ private:
                 m_wagons[i]->disembarkation();
             }
         }
-        if(!isLastStation)      //Then embark
+        if(currentStation!=stationsCount)       //Then embark if not last station
         {
             //Here loop through the wagons and call Wagon's embarkation()
             for(int i(0); i<m_wagonsCount; i++)
             {
-                m_wagons[i]->embarkation();
+                cout << "Wagon " << i+1 << " / " << m_wagonsCount << "\n";
+                m_wagons[i]->embarkation(currentStation, stationsCount);
             }
         }
         
@@ -234,7 +242,7 @@ public:
             int &currentStation = i;    //Just an alias
             
             bool isLastStation = (currentStation == stationsCount) ;
-            inStation(currentStation, isLastStation);
+            inStation(currentStation, stationsCount);
             if(!isLastStation)
             {
                 betweenStations();
@@ -251,6 +259,7 @@ public:
 
 int main()
 {
+    srand(time(0));         //In order to use rand in many different places
     const int wagonsCount(10), wagonMaxCapacity(30), stationsCount(7);
     
     //Create a metroTrain that will operate for N stations
