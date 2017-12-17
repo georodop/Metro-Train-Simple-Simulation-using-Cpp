@@ -7,7 +7,7 @@
  [*] 2.4:       REVERT! A seat is empty when set to nullptr. Passengers should
                 be created during Wagon's embarkation
  [*] 2.45:      Wagon's embarkation() first implementation
- [ ] 2.47:      Wagon's disembarkation() first implementation
+ [*] 2.47:      Wagon's disembarkation() first implementation
  [*] 2.48:      Modify embarkation() to check in a loop every seat if it is empty
  [ ] 2.5:       Passenger Destructor: do I need one?
  [*] 2.6:       Modify Passenger constructor calls since now it accepts arguments
@@ -77,14 +77,19 @@ public:
     {
         static int passengerId(0);
         passengerId++;
-        cout << "New Passenger with id: " 
-            << passengerId << " and destination: " << m_disembarkStation << "\n";
+        // cout << "New Passenger with id: " 
+        //     << passengerId << " and destination: " << m_disembarkStation << "\n";
         
     }
     
     ~Passenger()
     {
         
+    }
+    
+    int getDisembarkStation()
+    {
+        return m_disembarkStation;
     }
     
 };
@@ -127,9 +132,10 @@ public:
         cout << "A wagon was destroyed \n";
     }
     
-    //Disembark the Passengers whose disembarkStation = currentStation.
+    //Disembark the Passengers whose disembarkStation == currentStation.
     //Passenger objects will be deleted here after disembarkation
-    void disembarkation()
+    //Returns the count of disembarked passengers
+    int disembarkation(int currentStation)
     {
         /***********************************************************************
          * ToDo2.47:
@@ -139,20 +145,36 @@ public:
          * Then delete m_passengers[i] and m_passengers[i] = nullptr
          * 
         /**********************************************************************/
+        int initialCount = m_passengersCount;       //Before disembarkation
+        for(int i(0); i<m_maxCapacity; i++)
+        {
+            if(m_passengers[i]!=nullptr)            //The seat is not empty
+            {
+                if(currentStation == m_passengers[i]->getDisembarkStation())
+                {
+                    delete m_passengers[i];
+                    m_passengers[i] = nullptr;
+                    m_passengersCount--;
+                }
+            }
+        }
+        int disembarkedCount = initialCount - m_passengersCount;
+        cout << disembarkedCount << " passengers disembarked \n";
+        return disembarkedCount;
     }
     
     //Here create and embark a random count of new Passengers
-    void embarkation(const int &currentStation, const int &stationsCount)
+    //We also set the destination station for every new passenger
+    //Returns the count of passengers that just embarked
+    int embarkation(const int &currentStation, const int &stationsCount)
     {
         int emptySeatsCount = (m_maxCapacity - m_passengersCount);
-        int newPassengersMax = getRandomNumber(0, emptySeatsCount);
+        int newPassengersCount = getRandomNumber(0, emptySeatsCount);
         
-        cout << emptySeatsCount << " empty seats. \t" << newPassengersMax
-            << " new passengers. \t" << m_passengersCount << " pre-existing passengers. \n";
         for
         (
-            int seat(0), newPassengers(0); 
-            seat<(m_maxCapacity) && newPassengers<newPassengersMax; 
+            int seat(0), passenger(0);
+            seat < m_maxCapacity && passenger < newPassengersCount; 
             seat++
         )
         {
@@ -161,10 +183,12 @@ public:
                 int destination = getRandomNumber(currentStation+1, stationsCount);
                 m_passengers[seat] = new Passenger(destination);
                 m_passengersCount++;
-                newPassengers++;
+                passenger++;
             }
         }
-        
+        // cout << emptySeatsCount << " empty seats. \t" << newPassengers <<" / "<< newPassengersMax
+        //     << " new passengers. \t" << m_passengersCount << " pre-existing passengers. \n";
+        return newPassengersCount;
     }
     
 
@@ -199,7 +223,7 @@ private:
             //Here loop through the wagons and call Wagon's disembarkation()
             for(int i(0); i<m_wagonsCount; i++)
             {
-                m_wagons[i]->disembarkation();
+                m_wagons[i]->disembarkation(currentStation);
             }
         }
         if(currentStation!=stationsCount)       //Then embark if not last station
