@@ -2,11 +2,12 @@
  [*] ToDo1:     Implement MetroTrain operate for N stations
  [*] 1.5:       Implement MetroTrain inStation
  [ ] 1.6:       Put first the public part in every class
- [*] ToDo2:     PassengerSeat Constructor first implementation
+ [*] ToDo2:     Passenger Constructor first implementation
  [*] 2.3:       Change Passenger to PassengerSeat and hold if the seat is empty
- [ ] 2.5:       PassengerSeat Destructor: do I need one?
- [*] 2.6:       Modify PassengerSeat constructor calls since now it accepts arguments
- [ ] 2.7:       PassengerSeat mutator to change seats from empty to taken
+ [*] 2.4:       REVERT! A seat is empty when set to nullptr. Passengers should
+                be created during Wagon's embarkation
+ [ ] 2.5:       Passenger Destructor: do I need one?
+ [*] 2.6:       Modify Passenger constructor calls since now it accepts arguments
  [ ] 2.8:       Implement MetroTrain betweenStations
  [ ] ToDo3:     Study more examples of dynamic memory allocation, pointers to 
                 pointers etc
@@ -14,7 +15,7 @@
  [ ] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
  [ ] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
                 in operate 
- [ ] ToDo7:     Create an accessor for PassengerSeat's busted variabl
+ [ ] ToDo7:     Create an accessor and a mutator for Passenger's busted variable
 
 *******************************************************************************/
 #include <iostream>
@@ -45,22 +46,22 @@ int getRandomNumber(int min, int max)
     return min + static_cast<int>((max - min + 1) * (rand() * fraction));
 }
 
-class PassengerSeat
+class Passenger
 {
 private:
-    bool m_isEmpty;
+    bool m_isEmpty;         //ToDo2.4
     bool m_hasTicket;
     bool m_rightForReducedTicket;
     //When the train gets to disembarkStation station, get off the train
     //if busted betweenStations then disembarkStation = nextStation
     int m_disembarkStation; 
     //if !hasTicket when ticketInspector enters the Waggon then busted=true
-    bool m_busted;        //ToDo7: I will need an accessor for this one
+    bool m_busted;        //ToDo7: I'll need an accessor and a mutator for this
     
 public:
     //Temporary default constructor till constructor calls modification
-    PassengerSeat() { } 
-    PassengerSeat
+    Passenger() { } 
+    Passenger
     (
         const int disembarkStation,
         const double probHasTicket = 0.5,
@@ -72,22 +73,21 @@ public:
         m_rightForReducedTicket(randomBoolWithProb(probReducedTicket)),
         m_busted(false)
     {
-        cout << "New PassengerSeat with destination: " << m_disembarkStation << "\n";
+        cout << "New Passenger with destination: " << m_disembarkStation << "\n";
         
     }
     
-    ~PassengerSeat()
+    ~Passenger()
     {
         
     }
     
-    //ToDo
 };
 
 class Wagon
 {
 private:
-    PassengerSeat** m_passengers;    //Pointer to a passengers array
+    Passenger** m_passengers;    //Pointer to a passengers array
     
     //Zero initialized at the constructor. Has to stay smaller than maxCapacity
     int m_passengersCount; 
@@ -95,17 +95,18 @@ private:
 
 public:
     //This constructor should create a wagon with empty Passenger seats 
+    //An empty seat is marked with a nullptr.
     Wagon(int maxCapacity): 
         m_maxCapacity(maxCapacity),
         m_passengersCount(0)
     {
-        m_passengers = new PassengerSeat*[maxCapacity];
+        m_passengers = new Passenger*[maxCapacity];
         for(int i(0); i<maxCapacity; i++)
         {
-            m_passengers[i] = new PassengerSeat(7); //ToDo: New argument
+            // m_passengers[i] = new Passenger(7); //ToDo: New argument
+            m_passengers[i] = nullptr;
         }
-        //m_passengers = new Passenger[maxCapacity];
-        //ToDo: set to nullptr every seat
+        //Old: m_passengers = new Passenger[maxCapacity];
         cout << "A wagon with capacity for " << maxCapacity  
             << " passengers, was created \n";
     }
@@ -135,7 +136,19 @@ public:
         // static int count;
         // count++;
         // cout << "Embarkation count " << count << "\n";
+        /*
+        int emptySeatsCount = (maxCapacity - currentPassengersCount);
+        int firstEmptySeat = m_passengersCount;     //Since seats start from 0
+        for(int i(0); i<emptySeats; i++)
+        {
+            // m_passengers[i] = new Passenger(7); //ToDo: New argument
+            int destination = Random number between 0 and stationsCount
+            m_passengers[i] = new Passenger(destination);
+        }
+        */
+        
     }
+    
 
     //inStation(currentStation) Probably I'll implement this in MetroTrain class
 };
@@ -162,7 +175,7 @@ private:
         cout << "inStation: " << currentStation << "\n";
         
         const bool isFirstStation = (currentStation == 1);
-        if(!isFirstStation)     //First disembark
+        if(!isFirstStation)     //Disembark first 
         {
             //Here loop through the wagons and call Wagon's disembarkation()
             for(int i(0); i<m_wagonsCount; i++)
