@@ -89,6 +89,24 @@ public:
     void setDestination(int station) {  m_disembarkStation = station; }
     
 };
+    
+//Auxiliary data type to be used by Wagon and MetroTrain objects
+struct Statistics
+{
+    int totalWithoutTicket;
+    int totalBusted;
+    int totalGotAway;
+};
+
+Statistics operator+(const Statistics &stat1, const Statistics &stat2)
+{
+    Statistics stats;
+	stats.totalWithoutTicket = stat1.totalWithoutTicket + stat2.totalWithoutTicket;
+	stats.totalBusted = stat1.totalBusted + stat2.totalBusted;
+	stats.totalGotAway = stat1.totalGotAway + stat2.totalGotAway;
+ 
+	return stats;
+}
 
 class Wagon
 {
@@ -100,7 +118,7 @@ private:
     int m_maxCapacity;
     int m_totalWithoutTicket;
     int m_totalBusted;
-
+    
 public:
     //This constructor should create a wagon with empty Passenger seats 
     //An empty seat is marked with a nullptr.
@@ -212,8 +230,8 @@ public:
         }
         return bustedCount;
     }
-    
-    void printStatistics()
+
+    Statistics printStatistics()
     {
         /***********************************************************************
          * ToDo: Store in the Wagon instances the statistics needed bellow
@@ -225,10 +243,15 @@ public:
          * - What is the total count of passengers that entered the wagon
          * - How many had a reduced ticket
          * ********************************************************************/
-         cout << "Embarked without a ticket: " << m_totalWithoutTicket << "\n";
-         cout << "Busted: " << m_totalBusted ;
-         cout << " Got away: " << m_totalWithoutTicket - m_totalBusted << "\n";
+        Statistics wagonStatistics;
+        wagonStatistics.totalWithoutTicket = m_totalWithoutTicket;
+        wagonStatistics.totalBusted = m_totalBusted;
+        wagonStatistics.totalGotAway = m_totalWithoutTicket - m_totalBusted;
+        cout << "Embarked without a ticket: " << m_totalWithoutTicket << "\n";
+        cout << "Busted: " << m_totalBusted ;
+        cout << " Got away: " << wagonStatistics.totalGotAway << "\n";
                     
+        return wagonStatistics;
     }
     
 };
@@ -333,12 +356,22 @@ public:
          * - Money collected during ticket inspections
          * Should call Wagon's printStatistics for every wagon.
          * ********************************************************************/
-        
+         
+        Statistics trainStats{0, 0, 0};
         for(int i(0); i<m_wagonsCount; i++)
         {
             cout << "\nWagon num. " << i+1 << " of " << m_wagonsCount << "\n";
-            m_wagons[i]->printStatistics();
+            Statistics wagonStats = m_wagons[i]->printStatistics();
+            trainStats = trainStats + wagonStats;
         }
+        
+        
+        cout << "\nStatistics for the whole train: \n";
+        cout << "Embarked without a ticket: " ;
+        cout << trainStats.totalWithoutTicket << "\n";
+        cout << "Busted: " << trainStats.totalBusted ;
+        cout << " Got away: " << trainStats.totalGotAway << "\n";
+        cout << "Total income from fines: " << trainStats.totalBusted * 60 << " Euro\n";
     }
         
 };
