@@ -15,13 +15,14 @@
  [*] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
  [*] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
                 in operate. Answer: in operate.
- [ ] ToDo7:     printStatistics:+ train's total revenue from ticket inspections
+ [*] ToDo7:     printStatistics:+ train's total revenue from ticket inspections
  [ ] ToDo10:    Separate .cpp and .h files
 
 *******************************************************************************/
 #include <iostream>
 
 using std::cout;
+using std::cin;
 
 
 #include <cassert>
@@ -379,7 +380,12 @@ public:
 int main()
 {
     srand(time(0));         //In order to use rand in many different places
-    const int wagonsCount(10), wagonMaxCapacity(30), stationsCount(7);
+    
+    cout << "How many stations do you want the train to operate for?\n";
+    cout << "Please enter an integer: ";
+    int inputN;
+    cin >> inputN;
+    const int wagonsCount(10), wagonMaxCapacity(30), stationsCount(inputN);
     
     //Create a metroTrain that will operate for N stations
     MetroTrain metroTrain1(wagonsCount, wagonMaxCapacity);
