@@ -11,7 +11,7 @@
  [*] 2.48:      Modify embarkation() to check in a loop every seat if it is empty
  [*] 2.6:       Modify Passenger constructor calls since now it accepts arguments
  [*] 2.8:       Implement MetroTrain betweenStations
- [ ] ToDo4:     Get the stationsCount from command line
+ [*] ToDo4:     Get the stationsCount from command line
  [*] ToDo5:     Delete m_currentStation from MetroTrain class if not needed
  [*] ToDo6:     Decide if stationsCount will be given in MetroTrain constructor or
                 in operate. Answer: in operate.
@@ -20,12 +20,11 @@
 
 *******************************************************************************/
 #include <iostream>
+#include <cassert>
+#include <cstdlib>       //For c++98 compatible rand()
 
 using std::cout;
 using std::cin;
-
-
-#include <cassert>
 
 // Returns randomly true with a given probability between 0 and 1
 // Assumes srand() has already been called
@@ -35,7 +34,6 @@ bool randomBoolWithProb(double probability)
     
     return rand()/(RAND_MAX+1.0) < probability;
 }
-
 
 // Generate a random number between min and max (inclusive)
 // Assumes srand() has already been called
@@ -97,6 +95,8 @@ struct Statistics
     int totalWithoutTicket;
     int totalBusted;
     int totalGotAway;
+    
+    Statistics(): totalWithoutTicket(0), totalBusted(0), totalGotAway(0) {  }
 };
 
 Statistics operator+(const Statistics &stat1, const Statistics &stat2)
@@ -133,7 +133,7 @@ public:
         for(int i(0); i<maxCapacity; i++)
         {
             // m_passengers[i] = new Passenger(7); //ToDo: New argument
-            m_passengers[i] = nullptr;
+            m_passengers[i] = NULL;
         }
         //Old: m_passengers = new Passenger[maxCapacity];
         cout << "A wagon with capacity for " << maxCapacity  
@@ -161,12 +161,12 @@ public:
         int initialCount = m_passengersCount;       //Before disembarkation
         for(int i(0); i<m_maxCapacity; i++)
         {
-            if(m_passengers[i]!=nullptr)            //The seat is not empty
+            if(m_passengers[i]!=NULL)            //The seat is not empty
             {
                 if(currentStation == m_passengers[i]->getDisembarkStation())
                 {
                     delete m_passengers[i];
-                    m_passengers[i] = nullptr;
+                    m_passengers[i] = NULL;
                     m_passengersCount--;
                 }
             }
@@ -193,7 +193,7 @@ public:
             seat++
         )
         {
-            if(m_passengers[seat] == nullptr)
+            if(m_passengers[seat] == NULL)
             {
                 int destination = getRandomNumber(currentStation+1, stationsCount);
                 m_passengers[seat] = new Passenger(destination);
@@ -218,7 +218,7 @@ public:
         int bustedCount(0);
         for(int seat(0); seat<m_maxCapacity; seat++)
         {
-            if(m_passengers[seat] != nullptr)           //The seat is not emtpy
+            if(m_passengers[seat] != NULL)           //The seat is not emtpy
             {
                 if(!m_passengers[seat]->getHasTicket())     //No ticket !
                 {
@@ -358,7 +358,7 @@ public:
          * Should call Wagon's printStatistics for every wagon.
          * ********************************************************************/
          
-        Statistics trainStats{0, 0, 0};
+        Statistics trainStats; 
         for(int i(0); i<m_wagonsCount; i++)
         {
             cout << "\nWagon num. " << i+1 << " of " << m_wagonsCount << "\n";
