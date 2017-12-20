@@ -5,17 +5,17 @@
 # run the program directly from command line giving any integer you want.
 arg=10
 
-git pull
+git pull &> /dev/null
 retval=$?
 if [ $retval -ne 0 ]; then
     echo "Return code was not zero but $retval"
-    git clone https://github.com/georodop/Metro-Train-Simple-Simulation-using-Cpp.git
+    git clone https://github.com/georodop/Metro-Train-Simple-Simulation-using-Cpp.git &> /dev/null
     cd ./Metro-Train-Simple-Simulation-using-Cpp
-    g++ metrotrain.cpp -o metrotrain.out -std=c++98;
+    g++ ./*.cpp -o metrotrain.out -std=c++98;
     ./metrotrain.out $arg
 else
-    echo "OK"
-    g++ metrotrain.cpp -o metrotrain.out -std=c++98;
+    g++ ./*.cpp -o metrotrain.out -std=c++98;
     ./metrotrain.out $arg
+    echo "OK"
 fi
   
