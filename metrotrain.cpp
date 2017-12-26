@@ -55,12 +55,8 @@ private:
     //When the train gets to disembarkStation station, get off the train
     //if busted betweenStations then disembarkStation = nextStation
     int m_disembarkStation; 
-    //if !hasTicket when ticketInspector enters the Waggon then busted=true
-    bool m_busted;        //ToDo7: I'll need an accessor and a mutator for this
     
 public:
-    //Temporary default constructor till constructor calls modification
-    Passenger() { } 
     Passenger
     (
         const int disembarkStation,
@@ -69,8 +65,7 @@ public:
     ):
         m_disembarkStation(disembarkStation),
         m_hasTicket(randomBoolWithProb(probHasTicket)),
-        m_rightForReducedTicket(randomBoolWithProb(probReducedTicket)),
-        m_busted(false)
+        m_rightForReducedTicket(randomBoolWithProb(probReducedTicket))
     {
         static int passengerId(0);
         passengerId++;
