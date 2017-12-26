@@ -91,8 +91,11 @@ struct Statistics
     int totalWithoutTicket;
     int totalBusted;
     int totalGotAway;
+    int totalPassengers;
     
-    Statistics(): totalWithoutTicket(0), totalBusted(0), totalGotAway(0) {  }
+    Statistics(): 
+                totalWithoutTicket(0), totalBusted(0),
+                totalGotAway(0), totalPassengers(0) {  }
 };
 
 Statistics operator+(const Statistics &stat1, const Statistics &stat2)
@@ -101,6 +104,7 @@ Statistics operator+(const Statistics &stat1, const Statistics &stat2)
 	stats.totalWithoutTicket = stat1.totalWithoutTicket + stat2.totalWithoutTicket;
 	stats.totalBusted = stat1.totalBusted + stat2.totalBusted;
 	stats.totalGotAway = stat1.totalGotAway + stat2.totalGotAway;
+	stats.totalPassengers = stat1.totalPassengers + stat2.totalPassengers;
  
 	return stats;
 }
@@ -111,10 +115,11 @@ private:
     Passenger** m_passengers;    //Pointer to a passengers array
     
     //Zero initialized at the constructor. Has to stay smaller than maxCapacity
-    int m_passengersCount; 
+    int m_passengersCount;                          //Currently in the wagon
     int m_maxCapacity;
     int m_totalWithoutTicket;
     int m_totalBusted;
+    int m_totalPassengers;                          //Includes disembarked
     
 public:
     //This constructor should create a wagon with empty Passenger seats 
@@ -123,7 +128,8 @@ public:
         m_maxCapacity(maxCapacity),
         m_passengersCount(0),
         m_totalWithoutTicket(0),
-        m_totalBusted(0)
+        m_totalBusted(0),
+        m_totalPassengers(0)
     {
         m_passengers = new Passenger*[maxCapacity];
         for(int i(0); i<maxCapacity; i++)
@@ -194,6 +200,7 @@ public:
                 int destination = getRandomNumber(currentStation+1, stationsCount);
                 m_passengers[seat] = new Passenger(destination);
                 m_passengersCount++;
+                m_totalPassengers++;
                 passenger++;
                 
                 if(!m_passengers[seat]->getHasTicket())     //No ticket !
@@ -239,9 +246,11 @@ public:
         wagonStatistics.totalWithoutTicket = m_totalWithoutTicket;
         wagonStatistics.totalBusted = m_totalBusted;
         wagonStatistics.totalGotAway = m_totalWithoutTicket - m_totalBusted;
+        wagonStatistics.totalPassengers = m_totalPassengers;
         cout << "Embarked without a ticket: " << m_totalWithoutTicket << "\n";
         cout << "Busted: " << m_totalBusted ;
         cout << " Got away: " << wagonStatistics.totalGotAway << "\n";
+        cout << "Total Passengers: " << wagonStatistics.totalPassengers << "\n";
                     
         return wagonStatistics;
     }
@@ -363,7 +372,8 @@ public:
         cout << trainStats.totalWithoutTicket << "\n";
         cout << "Busted: " << trainStats.totalBusted ;
         cout << " Got away: " << trainStats.totalGotAway << "\n";
-        cout << "Total income from fines: " << trainStats.totalBusted * 60 << " Euro\n\n";
+        cout << "Total income from fines: " << trainStats.totalBusted * 60 << " Euro\n";
+        cout << "Total passengers count: " << trainStats.totalPassengers << " \n\n";
     }
         
 };
